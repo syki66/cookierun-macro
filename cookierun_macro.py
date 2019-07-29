@@ -8,10 +8,10 @@ from PIL import Image
 
 width, height = pyautogui.size()  
 print("================================================================")
-print("쿠키런매크로 v3.0 --- 2019.07.04")
+print("쿠키런매크로 v3.1 --- 2019.07.29")
 print("현재해상도:", width, height)
 print("해상도 1920x1080에서 전체화면에서만 정상동작")
-print("추가사항: 별플레이어 섭종에 따른 풀스크린 대응(좌표값변경), 드래그 이용한 슬라이딩 추가, 기록초기화시 확인버튼 자동")
+print("추가사항: 시즌초기화시 and 00시 출첵 확인버튼 자동, 하트 소멸시 500초 대기, 플레이 대기시간 단축")
 print("================================================================")
 
 #안전모드, 에러시 탈출구 (마우스 왼쪽 위 모서리에 가져가면 에러 송출)
@@ -144,31 +144,44 @@ while(True):
     
     end_t = time.time()
     
-    if (end_t - start_t) > 460:
+    if (end_t - start_t) > 240:
         game_count += 1 #게임 판수 세기
         print("******************************", game_count,"판")
-        start_t = end_t
+        #start_t = end_t
         time.sleep(5)
         for i in range(4):
             time.sleep(1)
             Image_Classify() #매크로방지 뚫기함수
             time.sleep(1)
 
-        #test_img = ImageGrab.grab(bbox=(0,0,1920,1080)) # 에러난거 테스트
-        #test_img.save(str(game_count)+".png") # 에러난거 테스트
-        
-        time.sleep(3)
-        pyautogui.click(883, 986) #게임점수확인창(자랑하기 x축 984~1458, y축 887 아래로 보물상자 동일)
-        time.sleep(3)
-        pyautogui.click(883, 986) #보물상자 열기
-        time.sleep(3)
-        pyautogui.click(883, 986) #보물상자 확인
+
+        time.sleep(1)
+        pyautogui.click(883, 986) #게임점수확인창(자랑하기 x축 984~1458, y축 887~ 보물상자 동일)
         time.sleep(2)
-        pyautogui.click(1632, 259) #보물상자 없을시 포춘쿠키창 끄기
+
+        pyautogui.click(885,958) #보물상자 열기
         time.sleep(2)
+        pyautogui.click(885,958) #보물상자 확인
+        time.sleep(5)
+        pyautogui.click(885,958) # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
+        time.sleep(2)
+        pyautogui.click(1111,865) # 00시 출첵 2
+        time.sleep(2)
+
+        pyautogui.click(1111,635) # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
+        time.sleep(1)
+
+
+        heart_check = ImageGrab.grab(bbox=(0,0,1920,1080)) #하트 다떨어졌을시 500초 대기 (하트 충전시간은 8분)
+        if (heart_check.getpixel((1310,50))!=(255,0,0)):
+            print("생명 충전중....")
+            time.sleep(500)
+            start_t = time.time()
+        else:
+            start_t = time.time()
         pyautogui.click(1733, 963) #게임시작1
-        time.sleep(2)
+        time.sleep(1)
         pyautogui.click(1600, 914) #게임시작 2
         time.sleep(1)
 
-    
+
