@@ -12,18 +12,19 @@ setCount = 100 # 플레이 반복 횟수
 
 ingame_pos = [
     (1620, 914), # 점프
-    (958, 400), # 슬라이드 및 부스트 및 이어달리기
+    (958, 395), # 슬라이드 및 부스트 및 이어달리기
     (958, 380, 0.5), # 슬라이드 용 드래그
 ]
 
 window_pos = [
     ((883, 986), 2), #게임점수확인창
+    ((1640, 280), 2), # 행운쿠키 창 닫기
     ((885, 958), 2), #보물상자 열기
     ((885, 958), 10), #보물상자 확인
-    ((1111,865), 2), # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
-    ((885,958), 2), # 00시 출첵 2
-    ((1111,865), 2), # 00시 출첵 3
-    ((1111,635), 1), # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
+    ((1111, 865), 2), # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
+    ((885, 958), 2), # 00시 출첵 2
+    ((1111, 865), 2), # 00시 출첵 3
+    ((1111, 635), 1), # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
 ]
 
 startgame_pos = [
@@ -46,7 +47,6 @@ card_y = [ # y축 1열, 2열 좌표값
 
 heart_pos = (1310,50) # 첫번째 하트 위치 (잔량 확인)
 heart_delay = 500 # 하트 소진시 딜레이 시간값
-
 
 ### 함수 및 실행 코드
 def init(pause, failsafe):
@@ -117,16 +117,22 @@ def isHeartEmpty(position):
     os.system("scrot heart.png")
     heart_img = Image.open("heart.png")
 
-    if heart_img.getpixel(position) == (255,0,0):
-        return False
-    else:
+    if heart_img.getpixel(position)[0] < 200:
         return True
+    else:
+        return False
 
-def run(playtime, start_pos):
+width, height = pyautogui.size()
+if not (width == 1920 and height == 1080):
+    print("해상도를 1920 x 1080 으로 설정해주세요.")
+    print(f"현재 해상도 : {width} x {height}")
+else:
+    print("쿠키런 매크로 시작")
     init(pause, failsafe)
+    pushStartGame(startgame_pos)
+    count = 0
     start_time = time.time()
-    pyautogui.click(start_pos)
-    while(True): 
+    while count < setCount:
         inGame(ingame_pos)
         elapsed_time = time.time()
         if elapsed_time - start_time > playtime:
@@ -137,15 +143,5 @@ def run(playtime, start_pos):
                 time.sleep(heart_delay)
             pushStartGame(startgame_pos)
             start_time = time.time()
-
-width, height = pyautogui.size()
-if not (width == 1920 and height == 1080):
-    print("해상도를 1920 x 1080 으로 설정해주세요.")
-    print(f"현재 해상도 : {width} x {height}")
-else:
-    print("쿠키런 매크로 시작")
-    count = 0
-    while count <= setCount:
-        run(240, startgame_pos[1][0])
-        count += 1
-
+            count += 1
+            print(f"{count}판 완료")
