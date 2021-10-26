@@ -1,190 +1,148 @@
 import pyautogui
-import sys
 import time
-import image
-#import pytesseract
-# from PIL import ImageGrab
 import os
 from PIL import Image
 
-width, height = pyautogui.size()
-print("================================================================")
-print("쿠키런매크로")
-print("현재해상도:", width, height)
-print("해상도 1920x1080에서 전체화면에서만 정상동작")
-print("================================================================")
+### 변수 설정
+pause = 0.3 # 매크로 최소 시간 간격
+failsafe = True # 안전모드. 왼쪽 위쪽으로 마우스 올리면 매크로 중단.
 
-#안전모드, 에러시 탈출구 (마우스 왼쪽 위 모서리에 가져가면 에러 송출)
-pyautogui.PAUSE = 0.3 #메쏘드간 대기시간
-pyautogui.FAILSAFE = True
+playtime = 240 # 플레이 시간
+setCount = 100 # 플레이 반복 횟수
+
+ingame_pos = [
+    (1620, 914), # 점프
+    (958, 400), # 슬라이드 및 부스트 및 이어달리기
+    (958, 380, 0.5), # 슬라이드 용 드래그
+]
+
+window_pos_delay = [
+    ((883, 986), 2), #게임점수확인창
+    ((885, 958), 2), #보물상자 열기
+    ((885, 958), 10), #보물상자 확인
+    ((1111,865), 2), # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
+    ((885,958), 2), # 00시 출첵 2
+    ((1111,865), 2), # 00시 출첵 3
+    ((1111,635), 1), # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
+]
+
+startgame_pos = [
+    ((1733, 963), 1) #게임시작1
+    ((1600, 914), 1) #게임시작2
+]
+
+card_pos = [ # 매크로방지 카드 좌표
+    (593, 362), (948, 360), (1123, 404),
+    (586, 959), (883, 986), (1156, 705)
+]
+
+card_x = [(534,754), (828,1048), (1121,1341)] # 매크로방지게임 카드 픽셀 범위 (x축 1행, 2행)
+card_y = [ # y축 1열, 2열 좌표값
+            (500), 
+            (885)
+        ]
+
+heart_pos = (1310,50) # 첫번째 하트 위치 (잔량 확인)
+heart_delay = 500 # 하트 소진시 딜레이 시간값
 
 
-#쿠키런 매크로 방지 뚫는 함수
+### 함수 및 실행 코드
+def init(pause, failsafe):
+    '''입력 간격 및 안전모드 설정'''
+    pyautogui.PAUSE = pause
+    pyautogui.FAILSAFE = failsafe        
 
-img_position = [(593, 362),(948, 360),(1123, 404),(586, 959),(883, 986),(1156, 705)]
+def unlockCardgame(pos, x_range, y_range, delay):
+    '''쿠키런 매크로 방지용 미니게임을 뚫어주는 함수'''
+    os.system("scrot cardgame.png")
+    img = Image.open("cardgame.png")
+    capture = img.convert("L") # 흑백화
 
-def Image_Classify():
-    os.system("scrot screenshot.png")
-    img1 = Image.open("screenshot.png")
-    img1_black = img1.convert("L")
-    #img1_black.show()
-    #img1_black.save('fi2.png')
+    pixels = []
+    for y in y_range:
+        for x in x_range:
+            temp = []
+            for i in range(x[0], x[1]):
+                temp.append(capture.getpixel((i, y)))
+            pixels.append(temp)
     
-    #(534,500)얘가 기준값
-    result1 = []
-    result2 = []
-    result3 = []
-    result4 = []
-    result5 = []
-    result6 = []
-    
+    diff = []
+    for i in range(1, 6):
+        sum = 0
+        for j in range(len(pixels[0])):
+            sum += abs(pixels[i][j]-pixels[0][j])
+        diff.append((sum, i))
+    diff.sort(reverse=True)
 
-    img_y1 = 500
-    img_y2 = 885
-    for i in range(534,754):
-        c = (i, img_y1)
-        result1.append(img1_black.getpixel(c))
+    pyautogui.click(pos[diff[0][1]])
+    time.sleep(delay)
+    pyautogui.click(pos[diff[1][1]])
 
-    for i in range(534,754):
-        c = (i, img_y2)
-        result4.append(img1_black.getpixel(c))
-            
-    for i in range(828,1048):
-        c = (i, img_y1)
-        result2.append(img1_black.getpixel(c))
-        
-    for i in range(828,1048):
-        c = (i, img_y2)
-        result5.append(img1_black.getpixel(c))
-            
-    for i in range(1121,1341):
-        c = (i, img_y1)
-        result3.append(img1_black.getpixel(c))
-            
-    for i in range(1121,1341):
-        c = (i, img_y2)
-        result6.append(img1_black.getpixel(c))
-    
-    sum = [0,0,0,0,0]    
-    
-    for i in range(len(result1)):
-        sum[0] += abs(result2[i]-result1[i])
-        
-    for i in range(len(result1)):
-        sum[1] += abs(result3[i]-result1[i])
-        
-    for i in range(len(result1)):
-        sum[2] += abs(result4[i]-result1[i])
-    
-    for i in range(len(result1)):
-        sum[3] += abs(result5[i]-result1[i])
-        
-    for i in range(len(result1)):
-        sum[4] += abs(result6[i]-result1[i])
+def inGame(position):
+    '''인게임 매크로'''
+    pyautogui.click(position[0])
+    pyautogui.click(position[1])
+    pyautogui.dragTo(position[2][0], position[2][1], position[2][2], button='left')
+    pyautogui.click(position[0])
 
-    for i in range(len(sum)):
-        print("값",i," : ", sum[i])
-    
-    result = []
-    for i in range(len(sum)):
-        if sum[i] > 1300:
-            print(sum[i])
-            result.append(i+1) #두번째그림이 sum[0]이라서 1추가함
-    print("차출된값: ", result)
-    
-    #첫번째값이 기준값일경우
-    if len(result) == 2:
-        #다른 두개그림 클릭
-        time.sleep(2)
-        pyautogui.click(img_position[result[0]])
-        time.sleep(2)
-        pyautogui.click(img_position[result[1]])
-        time.sleep(2)
-        
-    #첫번째 값이 다른값일 경우
-    elif len(result) == 4:
-        time.sleep(2)
-        pyautogui.click(img_position[0])
-        time.sleep(2)
-        if 1 not in result:
-            pyautogui.click(img_position[1])
-        elif 2 not in result:
-            pyautogui.click(img_position[2])
-        elif 3 not in result:
-            pyautogui.click(img_position[3])
-        elif 4 not in result:
-            pyautogui.click(img_position[4])
-        elif 5 not in result:
-            pyautogui.click(img_position[5])
-        else:
-            pass
-        time.sleep(2)
+def closeWindows(pos_delay):
+    '''각종 창 자동으로 닫아주기'''
+    pyautogui.click(pos_delay[0][0])
+    time.sleep(pos_delay[0][1])
+    pyautogui.click(pos_delay[1][0])
+    time.sleep(pos_delay[1][1])
+    pyautogui.click(pos_delay[2][0])
+    time.sleep(pos_delay[2][1])
+    pyautogui.click(pos_delay[3][0])
+    time.sleep(pos_delay[3][1])
+    pyautogui.click(pos_delay[4][0])
+    time.sleep(pos_delay[4][1])
+    pyautogui.click(pos_delay[5][0])
+    time.sleep(pos_delay[5][1])
+    pyautogui.click(pos_delay[6][0])
+    time.sleep(pos_delay[6][1])
 
+def pushStartGame(pos_delay):
+    '''게임 시작버튼 누르기'''
+    pyautogui.click(pos_delay[0][0])
+    time.sleep(pos_delay[0][1])
+    pyautogui.click(pos_delay[1][0])
+    time.sleep(pos_delay[1][1])
 
-        
-        #첫번째값과 나머지하나클릭
+def isHeartEmpty(position):
+    '''게임 플레이용 하트 잔량 체크하기'''
+    os.system("scrot heart.png")
+    heart_img = Image.open("heart.png")
 
-    #매크로가 뜨지 않을경우
+    if heart_img.getpixel(position) == (255,0,0):
+        return False
     else:
-        pass
+        return True
 
+def run(playtime, start_pos):
+    init(pause, failsafe)
+    start_time = time.time()
+    pyautogui.click(start_pos)
+    while(True): 
+        inGame(ingame_pos)
+        elapsed_time = time.time()
+        if elapsed_time - start_time > playtime:
+            for _ in range(4):
+                unlockCardgame(card_pos, card_x, card_y, 3)
+            closeWindows(window_pos_delay)
+            if isHeartEmpty(heart_pos):
+                time.sleep(heart_delay)
+            pushStartGame(startgame_pos)
+            start_time = time.time()
 
-
-#인게임 매크로
-game_count = 0
-start_t = time.time()
-time.sleep(2)
-pyautogui.click(1620, 914) #게임시작2
-
-while(True):
-    
-    pyautogui.click(1620, 914) #점프
-    pyautogui.click(958,400) # 슬라이드 및 부스트 및 이어달리기
-    pyautogui.dragTo(958,380, 0.5, button='left') # 슬라이드 용 드래그
-    pyautogui.click(1620, 914) #점프
-    
-    end_t = time.time()
-    
-    if (end_t - start_t) > 240:
-        game_count += 1 #게임 판수 세기
-        print("******************************", game_count,"판")
-        #start_t = end_t
-        time.sleep(5)
-        for i in range(4):
-            time.sleep(1)
-            Image_Classify() #매크로방지 뚫기함수
-            time.sleep(1)
-
-
-        time.sleep(1)
-        pyautogui.click(883, 986) #게임점수확인창(자랑하기 x축 984~1458, y축 887~ 보물상자 동일)
-        time.sleep(2)
-
-        pyautogui.click(885,958) #보물상자 열기
-        time.sleep(2)
-        pyautogui.click(885,958) #보물상자 확인
-        time.sleep(9)
-        pyautogui.click(1111,865) # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
-        time.sleep(2)
-        pyautogui.click(885,958) # 00시 출첵 2
-        time.sleep(2)
-        pyautogui.click(1111,865) # 00시 출첵 3
-        time.sleep(2)
-
-        pyautogui.click(1111,635) # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
-        time.sleep(1)
-
-
-        os.system("scrot screenshot.png")
-        heart_check = Image.open("screenshot.png") #하트 다떨어졌을시 500초 대기 (하트 충전시간은 8분)
-        if (heart_check.getpixel((1310,50))!=(255,0,0)):
-            print("생명 충전중....")
-            time.sleep(500)
-            start_t = time.time()
-        else:
-            start_t = time.time()
-        pyautogui.click(1733, 963) #게임시작1
-        time.sleep(1)
-        pyautogui.click(1600, 914) #게임시작 2
-        time.sleep(1)
+width, height = pyautogui.size()
+if not (width == 1920 and height == 1080):
+    print("해상도를 1920 x 1080 으로 설정해주세요.")
+    print(f"현재 해상도 : {width} x {height}")
+else:
+    print("쿠키런 매크로 시작")
+    count = 0
+    while count <= setCount:
+        run(240, startgame_pos[1][0])
+        count += 1
 
