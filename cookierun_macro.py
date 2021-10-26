@@ -16,7 +16,7 @@ ingame_pos = [
     (958, 380, 0.5), # 슬라이드 용 드래그
 ]
 
-window_pos_delay = [
+window_pos = [
     ((883, 986), 2), #게임점수확인창
     ((885, 958), 2), #보물상자 열기
     ((885, 958), 10), #보물상자 확인
@@ -27,9 +27,11 @@ window_pos_delay = [
 ]
 
 startgame_pos = [
-    ((1733, 963), 1) #게임시작1
+    ((1733, 963), 1), #게임시작1
     ((1600, 914), 1) #게임시작2
 ]
+
+card_delay = 3 # 매크로방지 카드 딜레이
 
 card_pos = [ # 매크로방지 카드 좌표
     (593, 362), (948, 360), (1123, 404),
@@ -75,8 +77,9 @@ def unlockCardgame(pos, x_range, y_range, delay):
     diff.sort(reverse=True)
 
     pyautogui.click(pos[diff[0][1]])
-    time.sleep(delay)
+    time.sleep(1)
     pyautogui.click(pos[diff[1][1]])
+    time.sleep(delay)
 
 def inGame(position):
     '''인게임 매크로'''
@@ -128,8 +131,8 @@ def run(playtime, start_pos):
         elapsed_time = time.time()
         if elapsed_time - start_time > playtime:
             for _ in range(4):
-                unlockCardgame(card_pos, card_x, card_y, 3)
-            closeWindows(window_pos_delay)
+                unlockCardgame(card_pos, card_x, card_y, card_delay)
+            closeWindows(window_pos)
             if isHeartEmpty(heart_pos):
                 time.sleep(heart_delay)
             pushStartGame(startgame_pos)
