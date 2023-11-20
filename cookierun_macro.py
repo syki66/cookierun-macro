@@ -4,6 +4,8 @@ import os
 from PIL import Image
 
 ### 변수 설정
+leftLetterBox = 179 # FHD+ 해상도용 왼쪽 레터박스 적용, 세로는 1080 고정하기
+
 pause = 0.3 # 매크로 최소 시간 간격
 failsafe = True # 안전모드. 왼쪽 위쪽으로 마우스 올리면 매크로 중단.
 
@@ -13,39 +15,39 @@ playtime = 300 # 플레이 시간
 setCount = 10000 # 플레이 반복 횟수. 24시간 기준 약 180판 가능
 
 ingame_pos = [
-    (1085, 400), # 점프, 부스트, 이어달리기
-    (1085, 380), # 보너스타임용 드래그
+    (1085 + leftLetterBox, 400), # 점프, 부스트, 이어달리기
+    (1085 + leftLetterBox, 380), # 보너스타임용 드래그
 ]
 
 window_pos = [
-    ((885, 958), 3), #게임점수확인창
-    ((885, 958), 3), #보물상자 열기
-    ((885, 958), 6), #보물상자 확인
-    ((1111, 865), 3), # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
-    ((885, 958), 3), # 00시 출첵 2
-    ((1111, 865), 3), # 00시 출첵 3
-    ((1111, 635), 3), # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
-    ((1156, 705), 15), # 쿠키런앱 재실행
-    ((1730, 142), 3) # 공지 닫기
+    ((885 + leftLetterBox, 958), 3), #게임점수확인창
+    ((885 + leftLetterBox, 958), 3), #보물상자 열기
+    ((885 + leftLetterBox, 958), 6), #보물상자 확인
+    ((1111 + leftLetterBox, 865), 3), # 00시 출첵 1 or 주간 시즌 초기화 알림표 끄기
+    ((885 + leftLetterBox, 958), 3), # 00시 출첵 2
+    ((1111 + leftLetterBox, 865), 3), # 00시 출첵 3
+    ((1111 + leftLetterBox, 635), 3), # 시즌 초기화후 첫 점수 기록했을때 알림창 제거
+    ((1156 + leftLetterBox, 705), 15), # 쿠키런앱 재실행
+    ((1730 + leftLetterBox, 142), 3) # 공지 닫기
 ]
 
 startgame_pos = [
-    ((1733, 963), 2), #게임시작1
-    ((1600, 914), 2) #게임시작2
+    ((1733 + leftLetterBox, 963), 2), #게임시작1
+    ((1600 + leftLetterBox, 914), 2) #게임시작2
 ]
 
 card_delay = 10 # 매크로방지 카드 딜레이
 card_pos = [ # 매크로방지 카드 좌표
-            (593, 362), (948, 360), (1123, 404),
-            (586, 959), (885, 958), (1156, 705)
+            (593 + leftLetterBox, 362), (948 + leftLetterBox, 360), (1123 + leftLetterBox, 404),
+            (586 + leftLetterBox, 959), (885 + leftLetterBox, 958), (1156 + leftLetterBox, 705)
         ]
-card_x = [(534,754), (828,1048), (1121,1341)] # 매크로방지게임 카드 픽셀 범위 (x축 1행, 2행)
+card_x = [(534 + leftLetterBox, 754 + leftLetterBox), (828 + leftLetterBox, 1048 + leftLetterBox), (1121 + leftLetterBox, 1341 + leftLetterBox)] # 매크로방지게임 카드 픽셀 범위 (x축 1행, 2행)
 card_y = [ # y축 1열, 2열 좌표값
             (500), 
             (885)
         ]
 
-heart_pos = (1310,50) # 첫번째 하트 위치 (잔량 확인)
+heart_pos = (1310 + leftLetterBox,50) # 첫번째 하트 위치 (잔량 확인)
 heart_delay = 500 # 하트 소진시 딜레이 시간값
 
 ### 함수 및 실행 코드
@@ -108,8 +110,8 @@ def notice(delay):
     print("쿠키런 매크로 진행중...")
 
 width, height = pyautogui.size()
-if not (width == 1920 and height == 1080):
-    print("해상도를 1920 x 1080 으로 설정해주세요.")
+if not (height == 1080):
+    print("해상도 높이를 1080 으로 설정해주세요.")
     print(f"현재 해상도 : {width} x {height}")
 else:
     notice(init_delay)
