@@ -4,7 +4,7 @@ import os
 from PIL import Image
 
 ### 변수 설정
-leftLetterBox = 179 # FHD+ 해상도용 왼쪽 레터박스 적용, 세로는 1080 고정하기
+leftLetterBox = 174 # FHD+ 해상도용 왼쪽 레터박스 적용, 세로는 1080 고정하기
 
 pause = 0.3 # 매크로 최소 시간 간격
 failsafe = True # 안전모드. 왼쪽 위쪽으로 마우스 올리면 매크로 중단.
