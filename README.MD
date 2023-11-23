@@ -32,6 +32,11 @@
 
 - 오작동이 나올 수도 있으니 사용하지 않는 폰으로 하는것을 권장
 - 마우스가 Thonny 창 밖에 있어야 좌표 오작동을 안함
+- pyautogui 설치할때 오류나면 아래 명령어 실행
+```
+sudo rm /usr/lib/python3.11/EXTERNALLY-MANAGED
+```
+
 
 ---
 
