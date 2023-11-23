@@ -56,7 +56,7 @@ def init(pause, failsafe):
 
 def unlockCardgame(pos, x_range, y_range, delay):
     '''쿠키런 매크로 방지용 미니게임을 뚫어주는 함수'''
-    os.system("scrot cardgame.png")
+    os.system("grim ./cardgame.png")
     img = Image.open("cardgame.png")
     capture = img.convert("L") # 흑백화
 
@@ -93,7 +93,7 @@ def clickButtons(pos_delay):
 
 def isHeartEmpty(position):
     '''게임 플레이용 하트 잔량 체크하기'''
-    os.system("scrot heart.png")
+    os.system("grim ./heart.png")
     heart_img = Image.open("heart.png")
 
     if heart_img.getpixel(position)[0] < 200:
