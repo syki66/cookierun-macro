@@ -21,7 +21,7 @@
 - 안드로이드폰 `화면자동꺼짐 해제` 또는 10분 이상으로 설정
 - `scrcpy를 설치`하여 안드로이드폰 미러링 형식으로 작동하기 *[설치 참고](https://syki66.github.io/blog/2021/10/27/scrcpy.html)*
 - 터미널에서 아래 명령어를 이용하여 1프레임 전체화면으로 `scrcpy 실행`
-    - `./apps/scrcpy/scrcpy --max-fps 1 --fullscreen`
+    - `scrcpy --max-fps 1 --fullscreen -b 1M --crop 1080:1920:0:174`
 - 앱이 튕길때를 대비해서 홈스크린에 절적한 위치값에 쿠키런 앱 놓고 좌표설정하기
 - 쿠키런 설정
     - 왼쪽 : `슬라이드`, 오른쪽 : `점프`로 설정
